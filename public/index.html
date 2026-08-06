@@ -1,1 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#080a10" />
+  <title>Analyze V2.2</title>
+  <meta name="description" content="Analyze images, PDFs, code and text with AI." />
+  <link rel="icon" type="image/png" href="/analyze-logo.png" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="ambient ambient-left"></div>
+  <div class="ambient ambient-right"></div>
 
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <img src="/analyze-logo.png" alt="Analyze" class="brand-logo" />
+        <div>
+          <strong>Analyze</strong>
+          <span>Understand every file</span>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button class="history-toggle" id="historyToggle" type="button">
+          History
+        </button>
+        <div class="system-status" id="systemStatus">
+          <span class="status-dot"></span>
+          <span id="systemStatusText">Checking…</span>
+        </div>
+      </div>
+    </header>
+
+    <aside class="history-panel hidden" id="historyPanel">
+      <div class="history-header">
+        <div>
+          <span>ANALYSIS HISTORY</span>
+          <h2>Recent reports</h2>
+        </div>
+        <button type="button" id="clearHistory">Clear</button>
+      </div>
+      <div id="historyList" class="history-list"></div>
+    </aside>
+
+    <section class="hero">
+      <p class="eyebrow">AI ANALYSIS PLATFORM</p>
+      <h1>Analyze anything.<br /><span>Understand everything.</span></h1>
+      <p class="hero-description">
+        Upload photos and PDFs or paste text and code. Get a complete report,
+        file information, findings, scores and practical recommendations.
+      </p>
+    </section>
+
+    <section class="analyzer">
+      <div class="toolbar">
+        <div class="mode-tabs">
+          <button class="mode-button active" type="button" data-mode="file">File</button>
+          <button class="mode-button" type="button" data-mode="text">Text</button>
+          <button class="mode-button" type="button" data-mode="code">Code</button>
+        </div>
+
+        <label class="language-field">
+          <span>Language</span>
+          <select id="languageSelect">
+            <option value="English">English</option>
+            <option value="Turkish">Türkçe</option>
+            <option value="Other">Other…</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="other-language hidden" id="otherLanguageWrap">
+        <input id="otherLanguageInput" type="text" maxlength="50" placeholder="Write report language…" />
+      </div>
+
+      <div class="panel active" id="filePanel">
+        <label class="drop-zone" id="dropZone">
+          <input
+            id="fileInput"
+            type="file"
+            multiple
+            hidden
+            accept="image/*,.pdf,.txt,.md,.js,.mjs,.cjs,.html,.css,.json,.py,.java,.cpp,.c,.cs,.php,.ts,.tsx,.jsx"
+          />
+          <div class="upload-icon">↑</div>
+          <h2>Drop up to 3 files here</h2>
+          <p>Photos, PDFs, documents and code files · 15 MB maximum per file</p>
+          <span class="choose-file">Choose files</span>
+        </label>
+        <div class="file-list hidden" id="fileList"></div>
+      </div>
+
+      <div class="panel" id="textPanel">
+        <textarea id="textInput" maxlength="50000" placeholder="Paste the text you want to analyze…"></textarea>
+        <span class="counter" id="textCounter">0 / 50,000</span>
+      </div>
+
+      <div class="panel" id="codePanel">
+        <textarea id="codeInput" maxlength="50000" spellcheck="false" placeholder="Paste your code here…"></textarea>
+        <span class="counter" id="codeCounter">0 / 50,000</span>
+      </div>
+
+      <button class="analyze-button" id="analyzeButton" type="button">
+        <span class="spinner hidden" id="spinner"></span>
+        <span id="analyzeButtonText">Analyze</span>
+      </button>
+
+      <p class="status-message" id="statusMessage">Select content to begin.</p>
+    </section>
+
+    <section class="progress-card hidden" id="progressCard">
+      <div class="progress-header">
+        <span id="progressLabel">Preparing analysis…</span>
+        <strong id="progressPercent">0%</strong>
+      </div>
+      <div class="progress-track"><div id="progressBar"></div></div>
+    </section>
+
+    <section class="results hidden" id="resultsSection">
+      <div class="report-meta-bar">
+        <span id="speedBadge">⚡ 0.0 seconds</span>
+        <span id="modelBadge">GPT-5 Mini</span>
+        <span id="providerBadge">OpenRouter</span>
+        <span id="languageBadge">English</span>
+      </div>
+
+      <section class="report-section">
+        <div class="section-heading">
+          <span>FILE INFORMATION</span>
+          <h2>Uploaded content</h2>
+        </div>
+        <div class="file-info-grid" id="fileInfoGrid"></div>
+      </section>
+
+      <section class="report-section">
+        <div class="results-header">
+          <div>
+            <p class="eyebrow">AI SUMMARY</p>
+            <h2 id="reportTitle">Results</h2>
+            <p class="report-summary" id="reportSummary"></p>
+          </div>
+
+          <div class="score-ring" id="scoreRing" style="--score: 0">
+            <div>
+              <strong id="overallScore">0</strong>
+              <span>/100</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="report-section">
+        <div class="section-heading">
+          <span>AI PROBABILITY</span>
+          <h2>Generation likelihood</h2>
+        </div>
+        <div class="probability-grid" id="probabilityGrid"></div>
+        <p class="probability-note" id="probabilityNote"></p>
+      </section>
+
+      <section class="report-section">
+        <div class="section-heading">
+          <span>METRICS</span>
+          <h2>Detailed analysis</h2>
+        </div>
+        <div class="result-grid" id="resultGrid"></div>
+      </section>
+
+      <section class="list-grid">
+        <article class="list-card">
+          <span>FINDINGS</span>
+          <ul id="findingsList"></ul>
+        </article>
+        <article class="list-card">
+          <span>RECOMMENDATIONS</span>
+          <ul id="recommendationsList"></ul>
+        </article>
+      </section>
+
+      <div class="report-actions">
+        <button type="button" id="downloadJson">JSON</button>
+        <button type="button" id="downloadMarkdown">Markdown</button>
+        <button type="button" id="downloadTxt">TXT</button>
+        <button type="button" id="downloadCsv">CSV</button>
+        <button type="button" id="downloadDocx">DOCX</button>
+        <button type="button" id="printReport">PDF</button>
+        <button type="button" id="newAnalysis" class="primary-action">New analysis</button>
+      </div>
+
+      <p class="disclaimer">
+        AI probability is uncertain and non-definitive. Important security,
+        authenticity, legal, medical or financial decisions should be verified independently.
+      </p>
+    </section>
+
+    <section class="capabilities">
+      <article><span>PHOTO</span><h3>Visual analysis</h3><p>Visible subjects, composition, lighting, colors, resolution and dominant colors.</p></article>
+      <article><span>PDF</span><h3>Document intelligence</h3><p>Pages, word count, PDF version, summary, topics and readability.</p></article>
+      <article><span>CODE</span><h3>Software analysis</h3><p>Language, lines, comments, correctness, maintainability and security concerns.</p></article>
+      <article><span>TEXT</span><h3>Language analysis</h3><p>Words, characters, meaning, tone, clarity, findings and improvements.</p></article>
+    </section>
+
+    <footer><strong>Analyze</strong><span>V2.2 Final Feature Release</span></footer>
+  </main>
+
+  <script src="/script.js" defer></script>
+</body>
+</html>
